@@ -7,7 +7,7 @@ const Medico = {
   },
 
   obtenerTodos: (callback) => {
-    const query = 'CALL obtenerMedicos()';
+    //const query = 'CALL obtenerMedicos()';
     connection.query(query, callback);
   },
 
