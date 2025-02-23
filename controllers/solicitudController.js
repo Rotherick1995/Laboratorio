@@ -11,22 +11,23 @@ const obtenerSolicitudes = (req, res) => {
   });
 };
 
-// Insertar una nueva solicitud
+// Insertar una nueva solicitud (sin necesidad de enviar idSolicitud)
 const insertarSolicitud = (req, res) => {
-    const { idSolicitud, fechaSolicitud, idPacientes, idMedicos } = req.body;
-  
-    if (!idSolicitud || !fechaSolicitud || !idPacientes || !idMedicos) {
-      return res.status(400).json({ mensaje: "Todos los campos son obligatorios." });
+  const { fechaSolicitud, idPacientes, idMedicos } = req.body;
+
+  if (!fechaSolicitud || !idPacientes || !idMedicos) {
+    return res.status(400).json({ mensaje: "Todos los campos son obligatorios." });
+  }
+
+  // Insertar la solicitud, el idSolicitud se maneja automáticamente
+  Solicitud.insertar(fechaSolicitud, idPacientes, idMedicos, (err, result) => {
+    if (err) {
+      console.error("Error al insertar solicitud:", err.message);
+      return res.status(500).json({ mensaje: "Error al insertar solicitud" });
     }
-  
-    Solicitud.insertar(idSolicitud, fechaSolicitud, idPacientes, idMedicos, (err, result) => {
-      if (err) {
-        console.error("Error al insertar solicitud:", err.message);
-        return res.status(500).json({ mensaje: "Error al insertar solicitud" });
-      }
-      res.json({ mensaje: "Solicitud insertada correctamente", result });
-    });
-  };
+    res.json({ mensaje: "Solicitud insertada correctamente", result });
+  });
+};
 
 // Actualizar una solicitud existente
 const actualizarSolicitud = (req, res) => {

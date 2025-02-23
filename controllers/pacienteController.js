@@ -4,9 +4,18 @@ const Paciente = require('../models/pacienteModel');
 const insertarPaciente = (req, res) => {
   const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias } = req.body;
 
-  Paciente.insertar(nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, (err, results) => {
-    if (err) return res.status(500).json({ message: 'Error al insertar el paciente' });
-    res.status(201).json({ message: 'Paciente insertado exitosamente', data: results });
+  // Obtener el máximo idPaciente para generar el siguiente id
+  Paciente.obtenerMaxIdPaciente((err, results) => {
+    if (err) return res.status(500).json({ message: 'Error al obtener el máximo idPaciente' });
+
+    const maxId = results[0].maxId;
+    const idPaciente = maxId ? maxId + 1 : 1;  // Si no hay registros, iniciar desde 1
+
+    // Insertar el paciente con el nuevo id
+    Paciente.insertar(idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, (err, results) => {
+      if (err) return res.status(500).json({ message: 'Error al insertar el paciente' });
+      res.status(201).json({ message: 'Paciente insertado exitosamente', data: results });
+    });
   });
 };
 

@@ -1,11 +1,20 @@
-const db = require('../config/db')// Asegúrate de tener la configuración de tu base de datos
+const db = require('../config/db'); // Asegúrate de tener la configuración de tu base de datos
 
 module.exports = {
-  insertarReporte: (fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud, idreporte, callback) => {
-    const sql = "CALL InsertarReporte(?, ?, ?, ?, ?, ?, ?)";
-    db.query(sql, [fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud, idreporte], (err, results) => {
+  // Insertar reporte
+  insertarReporte: (fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud, callback) => {
+    // Obtener el valor máximo del idreporte
+    const sqlMaxId = "SELECT MAX(idreporte) AS max_id FROM treporte"; // Asegúrate de que la tabla sea 'treporte'
+    db.query(sqlMaxId, (err, resultMax) => {
       if (err) return callback(err, null);
-      callback(null, results);
+      const nuevoIdReporte = resultMax[0].max_id ? resultMax[0].max_id + 1 : 1; // Si no hay resultados, comenzamos con 1
+
+      // Ahora inserta el reporte con el nuevo idreporte generado
+      const sql = "CALL InsertarReporte(?, ?, ?, ?, ?, ?, ?)";
+      db.query(sql, [fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud, nuevoIdReporte], (err, results) => {
+        if (err) return callback(err, null);
+        callback(null, results);
+      });
     });
   },
 

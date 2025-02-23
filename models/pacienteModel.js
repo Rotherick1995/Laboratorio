@@ -1,9 +1,14 @@
 const connection = require('../config/db');
 
 const Paciente = {
-  insertar: (idPaciente,nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, callback) => {
+  obtenerMaxIdPaciente: (callback) => {
+    const query = 'SELECT MAX(idPaciente) AS maxId FROM tpacientes';
+    connection.query(query, callback);
+  },
+
+  insertar: (idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, callback) => {
     const query = 'CALL insertarPaciente(?, ?, ?, ?, ?, ?, ?, ?, ?,?)';
-    connection.query(query, [idPaciente,nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias], callback);
+    connection.query(query, [idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias], callback);
   },
 
   obtenerTodos: (callback) => {

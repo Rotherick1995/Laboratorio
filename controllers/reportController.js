@@ -1,21 +1,22 @@
 const Reporte = require('../models/reportModel');
 
+// Insertar un nuevo reporte
 const insertarReporte = (req, res) => {
-    const { idreporte, fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud } = req.body;
-  
-    // Verificar que todos los campos obligatorios estén presentes
-    if (!idreporte || !fechainicio || !fechaentrega || !prioridad || !observaciones || !estado || !idsolicitud) {
-      return res.status(400).json({ message: 'Todos los campos son obligatorios' });
-    }
-  
-    // Insertar el reporte con el idreporte proporcionado manualmente
-    Reporte.insertarReporte(fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud, idreporte, (err, results) => {
-      if (err) return res.status(500).json({ message: 'Error al insertar el reporte' });
-      res.status(201).json({ message: 'Reporte insertado exitosamente', data: results });
-    });
-  };
-  
+  const { fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud } = req.body;
 
+  // Verificar que todos los campos obligatorios estén presentes
+  if (!fechainicio || !fechaentrega || !prioridad || !observaciones || !estado || !idsolicitud) {
+    return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+  }
+
+  // Insertar el reporte sin el idreporte (lo generará automáticamente el modelo)
+  Reporte.insertarReporte(fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud, (err, results) => {
+    if (err) return res.status(500).json({ message: 'Error al insertar el reporte' });
+    res.status(201).json({ message: 'Reporte insertado exitosamente', data: results });
+  });
+};
+
+// Obtener todos los reportes
 const obtenerReportes = (req, res) => {
   Reporte.obtenerReportes((err, results) => {
     if (err) return res.status(500).json({ message: 'Error al obtener los reportes' });
@@ -23,6 +24,7 @@ const obtenerReportes = (req, res) => {
   });
 };
 
+// Actualizar reporte existente
 const actualizarReporte = (req, res) => {
   const { fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud } = req.body;
   const { idreporte } = req.params;
@@ -39,6 +41,7 @@ const actualizarReporte = (req, res) => {
   });
 };
 
+// Eliminar un reporte
 const eliminarReporte = (req, res) => {
   const { idreporte } = req.params;
 

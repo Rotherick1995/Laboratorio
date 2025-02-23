@@ -1,8 +1,20 @@
-const db = require('../config/db');  // Asegúrate de tener tu conexión a la base de datos
+const db = require('../config/db'); // Conexión a la base de datos
 
-// Insertar detalle de solicitud
-const insertarDetalleSolicitud = (idsolicitud, idprueba, callback) => {
-  db.query('CALL InsertarDetalleSolicitud(?, ?)', [idsolicitud, idprueba], (err, results) => {
+// Obtener el último ID de detalle de solicitud
+const obtenerUltimoIdDetalleSolicitud = (callback) => {
+  db.query('SELECT MAX(iddetallesol) AS ultimoId FROM tdetallesolicitud', (err, results) => {
+    if (err) {
+      console.error(err);
+      return callback(err, null);
+    }
+    const ultimoId = results[0].ultimoId || 0; // Si no hay registros, inicia en 0
+    callback(null, ultimoId);
+  });
+};
+
+// Insertar detalle de solicitud con ID generado en la app
+const insertarDetalleSolicitud = (iddetallesol, idsolicitud, idprueba, callback) => {
+  db.query('CALL InsertarDetalleSolicitud(?, ?, ?)', [iddetallesol, idsolicitud, idprueba], (err, results) => {
     if (err) {
       console.error(err);
       return callback(err);
@@ -44,4 +56,10 @@ const eliminarDetalleSolicitud = (iddetallesol, callback) => {
   });
 };
 
-module.exports = { insertarDetalleSolicitud, obtenerDetallesSolicitud, actualizarDetalleSolicitud, eliminarDetalleSolicitud };
+module.exports = { 
+  obtenerUltimoIdDetalleSolicitud,
+  insertarDetalleSolicitud, 
+  obtenerDetallesSolicitud, 
+  actualizarDetalleSolicitud, 
+  eliminarDetalleSolicitud 
+};

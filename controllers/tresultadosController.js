@@ -2,17 +2,14 @@ const Resultado = require('../models/tresultadosModel');
 
 // Insertar resultado
 const insertarResultado = (req, res) => {
-  const { idresultado, iddetallesol, resultado, unidad } = req.body;
+  const { iddetallesol, resultado, unidad } = req.body;
 
-  if (!idresultado || !iddetallesol || !resultado) {
+  if (!iddetallesol || resultado === undefined || !unidad) {
     return res.status(400).json({ message: 'Todos los campos son obligatorios' });
   }
 
-  Resultado.insertarResultado(idresultado, iddetallesol, resultado, unidad, (err, results) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Error al insertar el resultado' });
-    }
+  Resultado.insertarResultado(iddetallesol, resultado, unidad, (err, results) => {
+    if (err) return res.status(500).json({ message: 'Error al insertar el resultado' });
     res.status(201).json({ message: 'Resultado insertado exitosamente', data: results });
   });
 };

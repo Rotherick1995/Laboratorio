@@ -2,16 +2,18 @@ const AreaLaboratorio = require('../models/tarealaboratorioModel');
 
 // Insertar un área de laboratorio
 const insertarArea = (req, res) => {
-  const { nombre, descripcion, idarea } = req.body;
+  const { nombre, descripcion } = req.body;
 
   // Verificar que los campos obligatorios estén presentes
-  if (!nombre || !descripcion || !idarea) {
+  if (!nombre || !descripcion) {
     return res.status(400).json({ message: 'Todos los campos son obligatorios' });
   }
 
   // Llamar al procedimiento almacenado para insertar el área
-  AreaLaboratorio.insertarArea(nombre, descripcion, idarea, (err, results) => {
-    if (err) return res.status(500).json({ message: 'Error al insertar el área de laboratorio' });
+  AreaLaboratorio.insertarArea(nombre, descripcion, (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error al insertar el área de laboratorio' });
+    }
     res.status(201).json({ message: 'Área de laboratorio insertada exitosamente', data: results });
   });
 };

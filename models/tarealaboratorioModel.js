@@ -1,12 +1,23 @@
-const db = require('../config/db');  // Asegúrate de tener un archivo para la conexión DB
+const db = require('../config/db');  // Asegúrate de tener tu archivo para la conexión DB
 
-// Procedimiento para insertar un área de laboratorio
-const insertarArea = (nombre, descripcion, idarea, callback) => {
-  db.query('CALL InsertarAreaLaboratorio(?, ?, ?)', [nombre, descripcion, idarea], (err, results) => {
+// Procedimiento para insertar un área de laboratorio con auto incremento en la app
+const insertarArea = (nombre, descripcion, callback) => {
+  // Primero obtenemos el último idarea
+  db.query('SELECT MAX(idarea) AS max_id FROM tarealaboratorio', (err, result) => {
     if (err) {
       return callback(err, null);
     }
-    callback(null, results);
+
+    // Si no hay ningún registro, el primer id será 1
+    const nuevoIdArea = result[0].max_id ? result[0].max_id + 1 : 1;
+
+    // Ahora insertamos el área con el nuevo id generado
+    db.query('CALL InsertarAreaLaboratorio(?, ?, ?)', [nombre, descripcion, nuevoIdArea], (err, results) => {
+      if (err) {
+        return callback(err, null);
+      }
+      callback(null, results);
+    });
   });
 };
 
