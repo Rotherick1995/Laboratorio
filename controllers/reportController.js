@@ -11,7 +11,10 @@ const insertarReporte = (req, res) => {
 
   // Insertar el reporte sin el idreporte (lo generará automáticamente el modelo)
   Reporte.insertarReporte(fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud, (err, results) => {
-    if (err) return res.status(500).json({ message: 'Error al insertar el reporte' });
+    if (err) {
+      console.error(err);  // Imprimir el error para depurar
+      return res.status(500).json({ message: 'Error al insertar el reporte' });
+    }
     res.status(201).json({ message: 'Reporte insertado exitosamente', data: results });
   });
 };
