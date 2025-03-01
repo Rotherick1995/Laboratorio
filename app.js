@@ -9,6 +9,8 @@ const reportRoutes = require('./routes/reportRoutes');
 const tpruebaRoutes = require('./routes/tpruebaRoutes');
 const tdetallesolicitudRoutes = require('./routes/tdetallesolicitudRoutes');
 const resultadoRoutes = require('./routes/tresultadosRoutes');
+const cors=require('cors');
+app.use(cors());
 app.use(express.json());  
 
 // Usar las rutas
