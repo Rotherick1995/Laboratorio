@@ -1,24 +1,19 @@
-const mariadb = require('mariadb');
+const mysql = require('mysql2');
 require('dotenv').config();
 
-const pool = mariadb.createPool({
-  host: process.env.DB_HOST,  // Servidor de la base de datos
-  user: process.env.DB_USER,  // Usuario de la base de datos
-  password: process.env.DB_PASSWORD, // Contraseña del usuario
-  database: process.env.DB_NAME, // Nombre de la base de datos
-  connectionLimit: 5, // Límite de conexiones simultáneas
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
-async function getConnection() {
-  try {
-    const connection = await pool.getConnection();
-    console.log('✅ Conectado a la base de datos MariaDB');
-    return connection;
-  } catch (err) {
-    console.error('❌ Error de conexión a la base de datos:', err);
-    throw err;
+connection.connect((err) => {
+  if (err) {
+    console.error('Error de conexión a la base de datos:', err);
+  } else {
+    console.log('Conectado a la base de datos MySQL');
   }
-}
+});
 
-module.exports = { getConnection };
-
+module.exports = connection;
