@@ -22,7 +22,7 @@ app.use('/api', tarealaboratorioRoutes);
 app.use('/api', tpruebaRoutes);
 app.use('/api', tdetallesolicitudRoutes);
 app.use('/api', resultadoRoutes);
-const puerto = 2000;
+const puerto = 2500;
 app.listen(puerto, () => {
   console.log(`Servidor corriendo en el puerto ${puerto}`);
 });
