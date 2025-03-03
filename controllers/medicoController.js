@@ -1,33 +1,49 @@
 const Medico = require('../models/medicoModel');
 
 const insertarMedico = (req, res) => {
+  console.log("📩 Datos recibidos en la solicitud:", req.body); // 🔍 Ver los datos recibidos
+
   const { nombre, apellidoPaterno, apellidoMaterno, especialidad, telefono } = req.body;
 
-  // Verificar que todos los campos obligatorios estén presentes
-  if (!nombre || !apellidoPaterno || !apellidoMaterno || !especialidad) {
-    return res.status(400).json({ mensaje: "Todos los campos son obligatorios." });
+  // Verificar qué campo falta específicamente
+  let camposFaltantes = [];
+  if (!nombre) camposFaltantes.push("nombre");
+  if (!apellidoPaterno) camposFaltantes.push("apellidoPaterno");
+  if (!apellidoMaterno) camposFaltantes.push("apellidoMaterno");
+  if (!especialidad) camposFaltantes.push("especialidad");
+  if (!telefono) camposFaltantes.push("telefono");
+
+  if (camposFaltantes.length > 0) {
+    console.warn("⚠️ Faltan los siguientes campos:", camposFaltantes.join(", "));
+    return res.status(400).json({
+      mensaje: "Todos los campos son obligatorios.",
+      camposFaltantes: camposFaltantes // Enviar qué campos faltan
+    });
   }
 
   // Obtener el máximo idMedico para generar el siguiente id
   Medico.obtenerMaxIdMedico((err, results) => {
     if (err) {
-      console.error("Error al obtener el máximo idMedico:", err.message);
+      console.error("❌ Error al obtener el máximo idMedico:", err.message);
       return res.status(500).json({ mensaje: "Error al obtener el máximo idMedico" });
     }
 
     const maxId = results[0].maxId;
-    const idMedico = maxId ? maxId + 1 : 1;  // Si no hay registros, iniciar desde 1
+    const idMedico = maxId ? maxId + 1 : 1;
+    console.log("🔢 Nuevo ID generado:", idMedico);
 
     // Insertar el médico con el nuevo id
     Medico.insertar(idMedico, nombre, apellidoPaterno, apellidoMaterno, especialidad, telefono, (err, result) => {
       if (err) {
-        console.error("Error al insertar médico:", err.message);
+        console.error("❌ Error al insertar médico:", err.message);
         return res.status(500).json({ mensaje: "Error al insertar médico" });
       }
-      res.json({ mensaje: "Médico insertado correctamente", result });
+      res.json({ mensaje: "✅ Médico insertado correctamente", result });
     });
   });
 };
+
+
 
 const obtenerMedicos = (req, res) => {
   Medico.obtenerTodos((err, result) => {
