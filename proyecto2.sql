@@ -1,5 +1,5 @@
-create database laboratorio;
-use laboratorio;
+create database laboratorio2;
+use laboratorio2;
 
 create table tpacientes (
     idpacientes int primary key ,

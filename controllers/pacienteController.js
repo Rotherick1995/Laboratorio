@@ -1,50 +1,77 @@
 const Paciente = require('../models/pacienteModel');
 
-// Función para insertar un nuevo paciente (POST)
+// Obtener todos los pacientes
+const obtenerPacientes = (req, res) => {
+  Paciente.obtenerTodos((err, results) => {
+    if (err) {
+      console.error("Error al obtener pacientes:", err.message);
+      return res.status(500).json({ mensaje: "Error al obtener pacientes" });
+    }
+    res.json(results[0]); // Asumiendo que `results[0]` es donde vienen los datos
+  });
+};
+
+// Insertar un paciente
 const insertarPaciente = (req, res) => {
   const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias } = req.body;
 
-  // Obtener el máximo idPaciente para generar el siguiente id
-  Paciente.obtenerMaxIdPaciente((err, results) => {
-    if (err) return res.status(500).json({ message: 'Error al obtener el máximo idPaciente' });
+  // Validaciones básicas
+  if (!nombre || !apellidoPaterno || !apellidoMaterno || !fechaNacimiento) {
+    return res.status(400).json({ mensaje: "Todos los campos obligatorios deben completarse." });
+  }
 
-    const maxId = results[0].maxId;
-    const idPaciente = maxId ? maxId + 1 : 1;  // Si no hay registros, iniciar desde 1
-
-    // Insertar el paciente con el nuevo id
-    Paciente.insertar(idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, (err, results) => {
-      if (err) return res.status(500).json({ message: 'Error al insertar el paciente' });
-      res.status(201).json({ message: 'Paciente insertado exitosamente', data: results });
-    });
+  // Llamar al modelo para insertar el paciente
+  Paciente.insertar(nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, (err) => {
+    if (err) {
+      console.error("Error al insertar paciente:", err.message);
+      return res.status(500).json({ mensaje: "Error al agregar paciente" });
+    }
+    res.json({ mensaje: "Paciente agregado correctamente" });
   });
 };
 
-// Función para obtener todos los pacientes (GET)
-const obtenerPacientes = (req, res) => {
-  Paciente.obtenerTodos((err, results) => {
-    if (err) return res.status(500).json({ message: 'Error al obtener pacientes' });
-    res.status(200).json({ data: results });
-  });
-};
-
-// Función para actualizar un paciente (PUT)
+// Actualizar un paciente
 const actualizarPaciente = (req, res) => {
-  const { idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias } = req.body;
+  const idPaciente = Number(req.params.id);
+  const { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias } = req.body;
 
-  Paciente.actualizar(idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, (err, results) => {
-    if (err) return res.status(500).json({ message: 'Error al actualizar el paciente' });
-    res.status(200).json({ message: 'Paciente actualizado exitosamente', data: results });
+  if (!idPaciente) {
+    return res.status(400).json({ mensaje: "ID del paciente es obligatorio." });
+  }
+
+  if (!nombre || !apellidoPaterno || !apellidoMaterno || !fechaNacimiento) {
+    return res.status(400).json({ mensaje: "Todos los campos obligatorios deben completarse." });
+  }
+
+  Paciente.actualizar(idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, (err) => {
+    if (err) {
+      console.error("Error al actualizar paciente:", err.message);
+      return res.status(500).json({ mensaje: "Error al actualizar paciente" });
+    }
+    res.json({ mensaje: "Paciente actualizado correctamente" });
   });
 };
 
-// Función para eliminar un paciente (DELETE)
+// Eliminar un paciente
 const eliminarPaciente = (req, res) => {
-  const { idPaciente } = req.params;
+  const idPaciente = Number(req.params.id);
 
-  Paciente.eliminar(idPaciente, (err, results) => {
-    if (err) return res.status(500).json({ message: 'Error al eliminar el paciente' });
-    res.status(200).json({ message: 'Paciente eliminado exitosamente', data: results });
+  if (!idPaciente) {
+    return res.status(400).json({ mensaje: "ID del paciente es obligatorio." });
+  }
+
+  Paciente.eliminar(idPaciente, (err) => {
+    if (err) {
+      console.error("Error al eliminar paciente:", err.message);
+      return res.status(500).json({ mensaje: "Error al eliminar paciente" });
+    }
+    res.json({ mensaje: "Paciente eliminado correctamente" });
   });
 };
 
-module.exports = { insertarPaciente, obtenerPacientes, actualizarPaciente, eliminarPaciente };
+module.exports = {
+  obtenerPacientes,
+  insertarPaciente,
+  actualizarPaciente,
+  eliminarPaciente
+};

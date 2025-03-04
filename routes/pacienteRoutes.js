@@ -1,53 +1,17 @@
-const express = require("express");
-const Paciente = require("../models/pacienteModel");
+const express = require('express');
+const pacienteController = require('../controllers/pacienteController');
 const router = express.Router();
 
 // Obtener todos los pacientes
-router.get("/pacientes", (req, res) => {
-  Paciente.obtenerTodos((err, result) => {
-    if (err) {
-      console.error("Error al obtener pacientes:", err.message);
-      return res.status(500).json({ mensaje: "Error al obtener pacientes" });
-    }
-    res.json(result[0]);
-  });
-});
+router.get('/pacientes', pacienteController.obtenerPacientes);
 
 // Insertar un paciente
-router.post("/pacientes", (req, res) => {
-  let { idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias } = req.body;
-  Paciente.insertar(idPaciente, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, (err) => {
-    if (err) {
-      console.error("Error al insertar paciente:", err.message);
-      return res.status(500).json({ mensaje: "Error al agregar paciente" });
-    }
-    res.json({ mensaje: "Paciente agregado correctamente" });
-  });
-});
+router.post('/pacientes', pacienteController.insertarPaciente);
 
 // Actualizar un paciente
-router.put("/pacientes/:id", (req, res) => {
-  let { id } = req.params;
-  let { nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias } = req.body;
-  Paciente.actualizar(id, nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, telefono, email, direccion, tipoSangre, alergias, (err) => {
-    if (err) {
-      console.error("Error al actualizar paciente:", err.message);
-      return res.status(500).json({ mensaje: "Error al actualizar paciente" });
-    }
-    res.json({ mensaje: "Paciente actualizado correctamente" });
-  });
-});
+router.put('/pacientes/:id', pacienteController.actualizarPaciente);
 
 // Eliminar un paciente
-router.delete("/pacientes/:id", (req, res) => {
-  let { id } = req.params;
-  Paciente.eliminar(id, (err) => {
-    if (err) {
-      console.error("Error al eliminar paciente:", err.message);
-      return res.status(500).json({ mensaje: "Error al eliminar paciente" });
-    }
-    res.json({ mensaje: "Paciente eliminado correctamente" });
-  });
-});
+router.delete('/pacientes/:id', pacienteController.eliminarPaciente);
 
 module.exports = router;
