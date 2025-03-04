@@ -13,7 +13,7 @@ module.exports = {
       const nuevoIdReporte = resultMax[0].max_id ? resultMax[0].max_id + 1 : 1; // Si no hay resultados, comenzamos con 1
 
       // Ahora inserta el reporte con el nuevo idreporte generado
-      const sql = "CALL InsertarReporte(?, ?, ?, ?, ?, ?, ?)";
+      const sql = "CALL InsertarReporte2(?, ?, ?, ?, ?, ?, ?)";
       
       // Ejecutamos el procedimiento almacenado
       db.query(sql, [fechainicio, fechaentrega, prioridad, observaciones, estado, idsolicitud, nuevoIdReporte], (err, results) => {

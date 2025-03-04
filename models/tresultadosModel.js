@@ -41,7 +41,7 @@ const obtenerResultados = (callback) => {
 
 // Actualizar resultado
 const actualizarResultado = (idresultado, iddetallesol, resultado, unidad, callback) => {
-  db.query('CALL ActualizarResultado(?, ?, ?, ?)', [idresultado, iddetallesol, resultado, unidad], (err, results) => {
+  db.query('CALL ActualizarResultado2(?, ?, ?, ?)', [idresultado, iddetallesol, resultado, unidad], (err, results) => {
     if (err) {
       console.error(err);
       return callback(err);

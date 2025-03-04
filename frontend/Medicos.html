@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear y Mostrar Médicos</title>
+    <!-- Cargar Bootstrap desde CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .table-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        table th, table td {
+            text-align: center;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        .editable {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Crear Nuevo Médico</h1>
+
+        <!-- Formulario de creación de médico -->
+        <form id="medicoForm">
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="apellidoPaterno" class="form-label">Apellido Paterno</label>
+                <input type="text" id="apellidoPaterno" name="apellidoPaterno" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="apellidoMaterno" class="form-label">Apellido Materno</label>
+                <input type="text" id="apellidoMaterno" name="apellidoMaterno" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="especialidad" class="form-label">Especialidad</label>
+                <input type="text" id="especialidad" name="especialidad" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="text" id="telefono" name="telefono" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Crear Médico</button>
+        </form>
+
+        <div id="error-message" class="error mt-3"></div>
+
+        <h2 class="text-center mt-5">Lista de Médicos</h2>
+
+        <!-- Contenedor de la tabla centrado -->
+        <div class="table-container">
+            <!-- Tabla para mostrar la lista de médicos -->
+            <table id="medicosTable" class="table table-bordered mt-4">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido Paterno</th>
+                        <th>Apellido Materno</th>
+                        <th>Especialidad</th>
+                        <th>Teléfono</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los médicos se cargarán aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Cargar Scripts de Bootstrap y tu lógica -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const API_URL = "http://localhost:2500/api/medicos"; // Asegúrate de que esta URL sea la correcta
+        let medicoEditado = null; // Para almacenar el médico que se está editando
+
+        // Función para manejar el envío del formulario
+        document.getElementById('medicoForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita el envío tradicional del formulario
+
+            // Recoger los datos del formulario
+            const medicoData = {
+                nombre: document.getElementById('nombre').value,
+                apellidoPaterno: document.getElementById('apellidopaterno').value,
+                apellidoMaterno: document.getElementById('apellidomaterno').value,
+                especialidad: document.getElementById('especialidad').value,
+                telefono: document.getElementById('telefono').value
+            };
+
+            // Si estamos editando, hacer un PUT, si no, hacer un POST
+            if (medicoEditado) {
+                actualizarMedico(medicoData);
+            } else {
+                crearMedico(medicoData);
+            }
+        });
+
+        // Función para crear un nuevo médico
+        function crearMedico(medicoData) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(medicoData),
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert('Médico creado exitosamente');
+                obtenerMedicos();
+            })
+            .catch(error => console.error("Error al crear médico:", error));
+        }
+
+        // Función para actualizar un médico
+        function actualizarMedico(medicoData) {
+            fetch(`${API_URL}/${medicoEditado.idmedicos}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(medicoData),
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert('Médico actualizado exitosamente');
+                medicoEditado = null; // Limpiar la variable de médico editado
+                obtenerMedicos();
+            })
+            .catch(error => console.error("Error al actualizar médico:", error));
+        }
+
+        // Función para cargar los médicos
+        function obtenerMedicos() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    const tabla = document.getElementById("medicosTable").getElementsByTagName('tbody')[0];
+                    tabla.innerHTML = ""; // Limpiar la tabla antes de agregar los nuevos datos
+                    data.forEach(medico => {
+                        tabla.innerHTML += `
+                            <tr id="medico-${medico.idmedicos}">
+                                <td>${medico.idmedicos}</td>
+                                <td class="editable" contenteditable="false">${medico.nombre}</td>
+                                <td class="editable" contenteditable="false">${medico.apellidopaterno}</td>
+                                <td class="editable" contenteditable="false">${medico.apellidomaterno}</td>
+                                <td class="editable" contenteditable="false">${medico.especialidad}</td>
+                                <td class="editable" contenteditable="false">${medico.telefono}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarMedico(${medico.idmedicos})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="eliminarMedico(${medico.idmedicos})">Eliminar</button>
+                                </td>
+                            </tr>`;
+                    });
+                })
+                .catch(error => console.error("Error al obtener médicos:", error));
+        }
+
+        // Función para editar un médico
+        function editarMedico(id) {
+            medicoEditado = {
+                idmedicos: id,
+                nombre: document.querySelector(`#medico-${id} td:nth-child(2)`).textContent,
+                apellidoPaterno: document.querySelector(`#medico-${id} td:nth-child(3)`).textContent,
+                apellidoMaterno: document.querySelector(`#medico-${id} td:nth-child(4)`).textContent,
+                especialidad: document.querySelector(`#medico-${id} td:nth-child(5)`).textContent,
+                telefono: document.querySelector(`#medico-${id} td:nth-child(6)`).textContent
+            };
+
+            // Cambiar las celdas a inputs
+            const celdas = document.querySelectorAll(`#medico-${id} td.editable`);
+            celdas.forEach(celda => {
+                const valor = celda.textContent;
+                celda.innerHTML = `<input type="text" value="${valor}" class="form-control">`;
+                celda.contentEditable = false;
+            });
+
+            // Reemplazar el botón de editar por el de actualizar
+            const acciones = document.querySelector(`#medico-${id} td:last-child`);
+            acciones.innerHTML = `<button class="btn btn-success btn-sm" onclick="actualizarMedicoEnTabla(${id})">Actualizar</button>`;
+        }
+
+        // Función para actualizar un médico desde la tabla
+        function actualizarMedicoEnTabla(id) {
+            const celdas = document.querySelectorAll(`#medico-${id} td.editable input`);
+            const medicoData = {
+                nombre: celdas[0].value,
+                apellidoPaterno: celdas[1].value,
+                apellidoMaterno: celdas[2].value,
+                especialidad: celdas[3].value,
+                telefono: celdas[4].value
+            };
+
+            actualizarMedico(medicoData); // Usar PUT para actualizar en el backend
+        }
+
+        // Función para eliminar un médico
+        function eliminarMedico(id) {
+            if (confirm("¿Seguro que quieres eliminar este médico?")) {
+                fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                })
+                .then(response => response.json())
+                .then(() => {
+                    alert('Médico eliminado exitosamente');
+                    obtenerMedicos();
+                })
+                .catch(error => console.error("Error al eliminar médico:", error));
+            }
+        }
+
+        // Cargar los médicos al inicio
+        obtenerMedicos();
+    </script>
+</body>
+</html>
